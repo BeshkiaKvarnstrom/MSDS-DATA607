@@ -1,0 +1,115 @@
+---
+title: "DATA 607 Week 1 Assignment – Loading Data into a Data Frame"
+author: "Beshkia Kvarnstrom"
+date: "2023-01-29"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+
+```{r DATA607-Assignment1, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(ggplot2)
+library(plyr)
+```
+
+ Task - Choose one of the provided datasets on fivethirtyeight.com that you find interesting: https://data.fivethirtyeight.com/
+ 
+ You should first study the data and any other information on the GitHub site, and read the associated
+ fivethirtyeight.com article.
+ 
+ To receive full credit, you should:
+ 1. Take the data, and create one or more code blocks. You should finish with a data frame that contains a
+    subset of the columns in your selected dataset. If there is an obvious target (aka predictor or independent)
+    variable, you should include this in your set of columns. You should include (or add if necessary)
+    meaningful column names and replace (if necessary) any non-intuitive abbreviations used in the data that
+    you selected. For example, if you had instead been tasked with working with the UCI mushroom dataset,
+    you would include the target column for edible or poisonous, and transform “e” values to “edible.” Your
+    deliverable is the R code to perform these transformation tasks.
+ 
+ 2. Make sure that the original data file is accessible through your code—for example, stored in a GitHub
+    repository or AWS S3 bucket and referenced in your code. If the code references data on your local
+    machine, then your work is not reproducible!
+ 
+ 3. Start your R Markdown document with a two to three sentence “Overview” or “Introduction” description of
+    what the article that you chose is about, and include a link to the article.
+ 
+ 4. Finish with a “Conclusions” or “Findings and Recommendations” text block that includes what you might do
+    to extend, verify, or update the work from the selected article.
+ 
+ 5. Each of your text blocks should minimally include at least one header, and additional non-header text.
+
+ 6. You’re of course welcome—but not required--to include additional information, such as exploratory data
+    analysis graphics (which we will cover later in the course).
+
+ 7. Place your solution into a single R Markdown (.Rmd) file and publish your solution out to rpubs.com.
+
+ 8. Post the .Rmd file in your GitHub repository, and provide the appropriate URLs to your GitHub repositor y
+    and your rpubs.com file in your assignment link.
+ 
+ OVERVIEW
+ The Data I will be working with for this assignment compare the comsuption of wine, beer and other spirits of different countries across the   world. A row is listed for each country along with the amount of each alcoholic beverage.
+
+ The dataset was taken from: https://fivethirtyeight.com/features/dear-mona-followup-where-do-people-drink-the-most-beer-wine-and-spirits// 
+ 
+```{r Load Data, echo=TRUE}
+
+## Load data from GitHub
+
+AlcoholConsumptionData = read.table(file="https://raw.githubusercontent.com/BeshkiaKvarnstrom/MSDS-DATA607/main/drinks.csv", header=TRUE,sep=",")
+```
+
+
+```{r Read Data from DF, echo=TRUE}
+# Reading the data in the Dataframe
+AlcoholConsum <- data.frame(AlcoholConsumptionData$country, AlcoholConsumptionData$beer_servings, AlcoholConsumptionData$spirit_servings, AlcoholConsumptionData$wine_servings, AlcoholConsumptionData$total_litres_of_pure_alcohol)
+
+colnames(AlcoholConsum) <- c("COUNTRY", "BEER", "SPIRIT", "WINE", "TOTAL LITRES")
+
+AlcoholConsum
+```
+
+
+```{r echo=TRUE}
+# Countries without alcohol consumption
+NoConsumtion_sub <- subset(AlcoholConsum, BEER == 0.0 & WINE == 0.0)
+NoConsumtion_sub <- NoConsumtion_sub[, c("COUNTRY", "BEER", "WINE")]
+NoConsumtion_sub
+```
+
+ 
+```{r echo=TRUE}
+# Countries that consume alcohol
+
+AlcoholConsum_sub <- subset(AlcoholConsum, BEER > 0 & WINE > 0 )
+AlcoholConsum_sub <- AlcoholConsum_sub[, c("COUNTRY", "BEER", "WINE")]
+AlcoholConsum_sub
+```
+
+```{r}
+# Top 10 countries with highest consumption of alcohol pe liter
+
+TopConsum <- head(arrange(AlcoholConsum, desc(AlcoholConsum$`TOTAL LITRES`)), n = 10)
+TopConsum <- TopConsum[, c("COUNTRY", "BEER", "WINE")]
+TopConsum
+```
+
+
+
+```{r}
+Consumgg <- ggplot(NULL, aes(x, y)) + 
+geom_line(data=TopConsum, aes(x=COUNTRY, y=WINE, group=1), col="green") +
+geom_line(data=TopConsum, aes(x=COUNTRY, y=BEER, group=1), col="purple")+
+  labs(title = "WINE & BEER CONSUMPTION BY COUNTRY", x= "COUNTRY", y = "TOTAL SERVINGS", ylim=c(100,1000), breaks = 10) + 
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+# display the plot
+Consumgg
+```
+
+
+CONCLUSION
+
+The study shows that based on the top 10 total consumption by litre, beer was more popular than wine. Out Of the 194 countries 14 did not consume any alcohol. 
