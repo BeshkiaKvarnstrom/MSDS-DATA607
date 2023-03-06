@@ -1,0 +1,239 @@
+---
+title: "DATA-607-Project 2-Beshkia Kvarnstrom"
+author: "Beshkia Kvarnstrom"
+date: "2023-03-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyr)
+library(readr )
+library(kableExtra)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+```
+
+### The goal of this assignment is to give you practice in preparing different datasets for downstream analysis work.
+
+#### Your task is to:
+(1) Choose any three of the “wide” datasets identified in the Week 6 Discussion items. (You may use your own dataset; please don’t use my Sample Post dataset, since that was used in your Week 6 assignment!) For each of the three chosen datasets:
+
+ Create a .CSV file (or optionally, a MySQL database!) that includes all of the information included in the dataset. You’re encouraged to use a “wide” structure similar to how the information appears in the discussion item, so that you can practice tidying and transformations as described below.
+
+ Read the information from your .CSV file into R, and use tidyr and dplyr as needed to tidy and transform your data. [Most of your grade will be based on this step!]
+
+ Perform the analysis requested in the discussion item.
+
+ Your code should be in an R Markdown file, posted to rpubs.com, and should include narrative descriptions of your data cleanup work, analysis, and conclusions.
+
+
+(2) Please include in your homework submission, for each of the three chosen datasets:
+
+ The URL to the .Rmd file in your GitHub repository, and
+ The URL for your rpubs.com web page.
+
+## Dataset 1 - Student Test Score Results
+
+### Import Data from Github and load in R
+```{r Read Student Data from Github}
+Test_Score_Data <- read_csv('https://raw.githubusercontent.com/BeshkiaKvarnstrom/MSDS-DATA607/main/student_results.csv', 
+                          show_col_types = FALSE)
+```
+### Create dataframe to store the data 
+```{r}
+Test_Score_Data <- data.frame(Test_Score_Data)
+Test_Score_Data
+
+```
+## Tidying the Student Test Score Results data
+```{r}
+colnames(Test_Score_Data) <- c("ID", "NAME", "PHONE", "GENDER", "AGE", "TEST NO.", "TERM", "TEST SCORE")
+colnames(Test_Score_Data) <- c("ID", "NAME", "PHONE", "GENDER", "AGE", "TEST NO.", "TERM", "TEST SCORE")
+Test_Score_Data
+```
+
+## Analyze and Visualize the Student Test Score Results data
+
+```{r}
+# Analyzing the test score to determine the minimum, maximum, mean and median test scores for each term by gender. From the analysis you can see that females did better than males overall.
+Agg_TestScores <- Test_Score_Data %>% group_by(GENDER) %>% group_by(GENDER, TERM) %>%
+            summarise(
+                      "MIN TEST SCORE" = min(`TEST SCORE`), 
+                      "MAX TEST SCORE" = max(`TEST SCORE`),
+"MEAN TEST SCORE" = mean(`TEST SCORE`),              "MEDIAN TEST SCORE" = median(`TEST SCORE`),     
+                     .groups = 'drop'
+                    )
+
+Agg_TestScores
+
+```
+
+```{r}
+# The following plot compares the test scores for each gender and the terms taken. 
+ggplot(data = Agg_TestScores) +
+  geom_bar(mapping = aes(x = TERM, y = `MEAN TEST SCORE`, fill = GENDER), stat = 'identity') +
+  facet_grid(~ GENDER) +
+  theme(axis.text.x = element_text(angle = 70, hjust = 1, size=5)) +
+  labs(title = 'AVERAGE TEST SCORES PER TERM', subtitle = "By Gender")
+```
+
+```{r}
+# This visualition displays the test scores per student for each term
+ggplot(data = Test_Score_Data) +
+  geom_bar(mapping = aes(x=NAME, y=`TEST SCORE`, fill = `TERM`), stat = 'identity') +
+  facet_grid(~ `TEST NO.`) +
+  theme(axis.text.x = element_text(angle = 70, hjust = 1, size=5)) +
+  labs(title = 'STUDENT TEST SCORES' , subtitle = "By Term")
+```
+
+## Dataset 2 - 
+```{r Read Interest Rate Data from Github}
+Int_Rate_Data <- read_csv('https://raw.githubusercontent.com/BeshkiaKvarnstrom/MSDS-DATA607/main/interest_rate_of_banks.csv', 
+                          show_col_types = FALSE)
+
+```
+
+### Create dataframe to store the data 
+```{r}
+Int_Rate_Data <- data.frame(Int_Rate_Data)
+Int_Rate_Data
+
+```
+
+## Tidying the Student Test Score Results data
+```{r}
+
+# Use the tidyr function gather() to unpivot data from a "wide" to a "long" format
+Int_Rate_df <-gather(Int_Rate_Data, bank_name ,'interest_rate',2:8)
+
+#Remove columns with interest rates NA value
+Int_Rate_df <- Int_Rate_df[!apply(is.na(Int_Rate_df[3:3]),1,all), ]
+
+
+Int_Rate_df
+```
+
+Calculate Average interest rate to analyze the trend 
+```{r}
+Avg_Int_Rate_df <- Int_Rate_df %>% group_by(bank_name) %>% summarize(`average interest rate` = mean(`interest_rate`))
+
+head(Avg_Int_Rate_df)  %>% kable() %>% kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>% scroll_box(width="100%",height="300px")
+
+```
+
+```{r}
+ggplot(data=Avg_Int_Rate_df, aes(x=bank_name,y=`average interest rate`, group=1)) +
+  geom_line(arrow = arrow(), color = "purple",size = 1.2)+
+  geom_point(color = "green", size = 3)+
+  theme(axis.text.x=element_text(angle = 45, vjust = 0.5)) +
+  scale_fill_brewer(palette="Paired") + 
+  ggtitle("Average Interest Rate Per Bank") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  geom_text(aes(label=paste0(round(`average interest rate`,2))), vjust=-1, color="black", position = position_dodge(0.9), size=3.5) 
+```
+
+```{r}
+# The following plot compares the interest year across the years
+
+ggplot(data = Avg_Int_Rate_df) +
+  geom_bar(mapping = aes(x=bank_name,y=`average interest rate`, fill = bank_name), stat = 'identity') +
+  theme(axis.text.x = element_text(angle = 70, hjust = 1, size=5)) +
+  labs(title = 'AVERAGE INTEREST RATE')
+```
+
+## Dataset 3 - 
+### Import Data from Github and load in R
+```{r Read Subway Data from Github}
+NYC_Subway_Data <- read_csv('https://raw.githubusercontent.com/BeshkiaKvarnstrom/MSDS-DATA607/main/NYC_Subway_Ridership.csv', 
+                          show_col_types = FALSE)
+NYC_Subway_Data
+```
+
+### Create dataframe to store the data 
+```{r}
+NYC_Subway_Data <- data.frame(NYC_Subway_Data)
+NYC_Subway_Data
+
+```
+
+## Tidying the NYC Subway data
+```{r}
+# Each borough is used to separate the data in the file. This separation is identified by a row entry for each borough at the beginning of the respective borough's data set. We need to identify the row numbers for each borough.
+row_b <- c('The Bronx', 'Brooklyn', 'Manhattan', 'Queens')
+
+rownum <- c()
+
+for(i in 1:length(row_b)){
+  rownum[i] <- rownames(NYC_Subway_Data[which(NYC_Subway_Data$'X2013' == row_b[i]),])
+}
+
+```
+
+
+```{r}
+d = NULL
+for(i in 1:length(rownum)){
+
+  dat  <- NYC_Subway_Data[as.integer(rownum[i])+1:ifelse(!is.na(as.integer(rownum[i+1])-1),as.integer(rownum[i+1])-1,dim(NYC_Subway_Data)[1]),]
+
+  k <- as.integer(rownum[i])+1
+  l<-ifelse(!is.na(as.integer(rownum[i+1])-1),as.integer(rownum[i+1])-1,dim(NYC_Subway_Data)[1])         
+  
+ if (i == 1){
+    Bronx <- NYC_Subway_Data[k:l,]
+    Bronx['Borough'] <- row_b[1]
+ } else if (i == 2) {
+    Brooklyn <- NYC_Subway_Data[k:l,]
+    Brooklyn['Borough'] <- row_b[2]
+ }else if (i == 3) {
+    Manhattan <- NYC_Subway_Data[k:l,]
+    Manhattan['Borough'] <- row_b[3]
+ } else if (i == 4) {
+    Queens <- NYC_Subway_Data[k:l,]
+    Queens['Borough'] <- row_b[4]
+ }
+
+}
+
+# combined all sub datasets
+NYC_Subway_Data2 <- rbind(Bronx, Brooklyn, Manhattan, Queens)
+
+NYC_Subway_Data2 <- NYC_Subway_Data2 %>%
+  mutate('X2013' = as.integer(str_remove_all(NYC_Subway_Data2$'X2013', ',')),
+         'X2014' = as.integer(str_remove_all(NYC_Subway_Data2$'X2014', ',')),
+         'X2015' = as.integer(str_remove_all(NYC_Subway_Data2$'X2015', ',')),
+         'X2016' = as.integer(str_remove_all(NYC_Subway_Data2$'X2016', ',')),
+         'X2017' = as.integer(str_remove_all(NYC_Subway_Data2$'X2017', ',')),
+         'X2018' = as.integer(str_remove_all(NYC_Subway_Data2$'X2018', ',')),
+         'X2017.2018.Change' = as.integer(str_remove_all(NYC_Subway_Data2$'X2017.2018.Change', ',')),
+         'X2017.2018.Change2' = as.numeric(str_remove_all(NYC_Subway_Data2$'X2017.2018.Change2', '%')),
+         'X2018.Rank' = as.integer(NYC_Subway_Data2$'X2018.Rank')) %>%
+  select(Borough, colnames(NYC_Subway_Data2))
+
+
+NYC_Subway_Data2
+```
+
+
+```{r}
+# Use the tidyr function gather() to unpivot data from a "wide" to a "long" format
+Subway_df <-gather(NYC_Subway_Data2, Year ,'total riders',3:11)
+
+
+colnames(Subway_df) <- c('Borough', 'Subway Station', 'Year', 'Total Riders')
+Subway_df
+```
+
+```{r}
+
+ggplot(data = Subway_df) +
+  geom_bar(mapping = aes(x = Year, y = `Total Riders`, fill = Borough), stat = 'identity') +
+  facet_grid(~ Borough) +
+  theme(axis.text.x = element_text(angle = 70, hjust = 1)) +
+  labs(title = 'Average Riderhip from 2013 - 2018 by Borough')
+
+```
+
