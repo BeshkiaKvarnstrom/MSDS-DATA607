@@ -1,0 +1,58 @@
+---
+title: 'DATA 607 Discussion 11: Recommender Systems'
+author: "Beshkia Kvarnstrom"
+date: "2023-04-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## INSTRUCTIONS
+This week's  task is to analyze an existing recommender system that you find interesting.  
+
+You should:
+Perform a Scenario Design analysis as described below.  Consider whether it makes sense for your selected recommender system to perform scenario design twice, once for the organization (e.g. Amazon.com) and once for the organization's customers.
+Attempt to reverse engineer what you can about the site, from the site interface and any available information that you can find on the Internet or elsewhere.
+Include specific recommendations about how to improve the site's recommendation capabilities going forward. 
+Create your report using an R Markdown file, and create a discussion thread with a link to the GitHub repo where your Markdown file notebook resides.  You are not expected to need to write code for this discussion assignment.
+Here are two examples of the kinds of papers that might be helpful backgrounders for your research in #2 above (if you had chosen amazon.com or nytimes.com as your web site):
+
+Greg Linden, Brent Smith, and Jeremy York (2003): Amazon.com Recommendations:  Item-to-Item Collaborative Filtering,  IEEE Internet Computing. 
+Alex Spangher (2015): Building the Next New York Times Recommendation Engine
+
+## INTRODUCTION
+TikTok is owned by a Chinese company called ByteDance.
+
+TikTok has grown exponentially and has gained popularity as the most popular social media app (with over 700 million users) that allows users to create, watch, and share short videos on any topic. The length of TikTok videos ranges in duration from 3 seconds to 10 minutes. The platform allows users to get creative with their content using filters, stickers, voice overs, sound effects, and background music.
+
+I choose TikTok for my discussion because of its popularity as well as its rapid growth over the past 2 years and its use of video marketing marketing to pique its users interest almost to the point of addiction to the platform.. I am also intrigued by TikTok's “For You” feed where each user's experience is tailored to your own interests.
+
+According to "Sciencedirect.com", TikTok's recommendation algorithm was selected as one of the “Top 10 Global Breakthrough Technologies” by MIT Technology Review in 2021. This is mainly because, as indicated above, the algorithm satisfies each user's specific interests through the “For You” feed.
+
+Like many recommendation systems, TikTok’s “For You” feed is powered by user input through its large-scale recommendation system, Monolith.
+
+## SCENARIO ANALYSIS (REVIEW)
+![Scenario Design](ScenarioDesign.png)
+### Who are the target users?
+According to TikTok, of its over 750 million users worldwide, a larger proportion of its users are adults between the ages 18 to 24 which equates to 38.9% (409.1 million users).
+
+### What are their key goals?
+TikTok's key goal is to be the leading destination for short-form mobile video to inspire creativity and bring joy. This is achieved through the use of TikTok's Ads Manager whose key objective is to build Awareness, Consideration, and in-turn increase its conversion rate. According to the New York Times TikTok’s “ultimate goal” is adding daily active users, by optimizing its two closely related metrics in the stream of videos it serves: “retention” — that is, whether a user comes back — and “time spent.” The app wants to keep you there as long as possible.
+
+### How can you help them accomplish these goals?
+As Data Scientist, we can contribute to TikTok's goal and its growth by aid in the development of state-of-the-art machine learning models and strategies to improve the user consumption experience by improving the recommendation strategy of its short video service.
+
+
+## COnCLUSION
+AI and recommendation algorithms  are replacing  conventional human “Gate Keeper” in the role of content selection and news flows control. One of TikTok's main focus is to increase each users watch time in order to keeps is users addicted. Tiktok's recommendation algorithm is influenced by its users behavior, involvement and interact with its content and user/followers.
+
+## REFERENCES
+https://www.researchgate.net/publication/363416435_Recommendation_Algorithm_in_TikTok_Strengths_Dilemmas_and_Possible_Directions
+
+https://www.nytimes.com/2021/12/05/business/media/tiktok-algorithm.html
+
+https://www.sciencedirect.com/science/article/pii/S2667325821002235#:~:text=TikTok's%20recommendation%20algorithm%20was%20selected,herd%20effect%E2%80%9D%20of%20following%20hotspots.&text=TikTok%20recommendation%20algorithms%20%5B1%5D.
+
+https://thesocialshepherd.com/blog/tiktok-statistics#:~:text=TikTok%20is%20Most%20Popular%20With%20Younger%20Generations&text=Ages%2010%2D19%20are%2025,49%20is%2020.3%25%20of%20users.
