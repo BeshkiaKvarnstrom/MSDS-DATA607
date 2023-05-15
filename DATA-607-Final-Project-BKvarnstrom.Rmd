@@ -1,0 +1,330 @@
+---
+title: "DATA 607 Final Project"
+author: "Beshkia Kvarnstrom"
+date: "2023-05-10"
+output: rmdformats::readthedown
+---
+
+```{r setup, echo=TRUE, results='hide', warning=FALSE, message=FALSE, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# [MSDS 607 Final Project]{.underline} {.tabset}
+
+## REQUIREMENTS
+
+### Deliverables Schedule
+
+| Deliverable                | Due Date | Points |
+|:---------------------------|:--------:|-------:|
+| One Paragraph Proposal     |          |     20 |
+| Final Project              |          |    120 |
+| Final Project Presentation |          |     30 |
+
+### Policy on Collaboration
+
+You may work in a team of up to three people. Each project team member is responsible for understanding and being able to explain all the submitted project code. Remember that you can take work that you find elsewhere as a base to build on, but you need to acknowledge the source, so that I base your grade on what you contributed, not on what you started with!
+
+### 
+
+### Approval Meeting
+
+Once you've turned in your one paragraph proposal, I want to schedule a 15 minute phone meeting with each person or team, where you'll describe the reason (benefit) for doing this work and/or question you're seeking to answer, where you'll source the data, and the overall flow. For team projects, I also want you to articulate the roles and responsibilities of each team member.
+
+### Final Project Checklist
+
+To receive full credit, you'll need to deliver on all the items in the checklist below. Please read carefully through this checklist before you make your project proposal. You are (within these checklist constraints) strongly urged to limit scope and make the necessary simplifying assumptions so that you can deliver your work on time!
+
+-   Proposal describes your motivation for performing this analysis.
+
+-   Proposal describes likely data sources.
+
+-   Your project has a recognizable "data science workflow," such as the OSEMN workflow or Hadley Wickham's Grammar of Data Science. [Example: First the data is acquired, then necessary transformations and clean-up are performed, then the analysis and presentation work is performed]
+
+-   Project includes data from at least two different types of data sources (e.g., two or more of these: relational or CSV, Neo4J, web page [scraped or API], MongoDB, etc.)
+
+-   Project includes at least one data transformation operation. [Examples: transforming from wide to long; converting columns to date format]
+
+-   Project includes at least one statistical analysis and at least one graphics that describes or validates your data.
+
+-   Project includes at least one graphic that supports your conclusion(s).
+
+-   Project includes at least one statistical analysis that supports your conclusion(s).
+
+-   Project includes at least one feature that we did not cover in class! There are many examples: "I used ggmap; I created a decision tree; I ranked the results; I created my presentation slides directly from R; I figured out to use OAuth 2.0..."
+
+-   Presentation. Was the presentation delivered in the allotted time?
+
+-   Presentation. Did you show (at least) one challenge you encountered in code and/or data, and what you did when you encountered that challenge? If you didn't encounter any challenges, your assignment was clearly too easy for you!
+
+-   Presentation. Did the audience come away with a clear understanding of your motivation for undertaking the project?
+
+-   Presentation. Did the audience come away with a clear understanding of at least one insight you gained or conclusion you reached or hypothesis you "confirmed" (rejected or failed to reject...)?
+
+-   Code and data. Have you delivered the submitted code and data where it is self-contained---preferably in rpubs.com and GitHub? Am I able to fully reproduce your results with what you've delivered? You won't receive full credit if your code references data on your local machine!
+
+-   Code and data. Does all the delivered code run without errors?
+
+-   Code and data. Have you delivered your code and conclusions using a "reproducible research" tool such as RMarkdown?
+
+-   Deadline management. Were your draft project proposal, project, and presentation delivered on time? Any part of the project that is turned in late will receive a maximum grade of 80%. Please turn in your work on time! You are of course welcome to deliver ahead of schedule!
+
+## SCOPE
+
+### INTRODUCTION
+
+TikTok, owned by a Chinese company called ByteDance, has grown exponentially and has gained popularity as one of the most popular social media app (with over 700 million users) . Tiktok allows its  users to create, watch, and share short videos on any topic as well as users are able to live stream and connect with other fellow users across the Globe through live matches or other video messaging. The platform allows users to get creative with their content using filters, stickers, voice overs, sound effects, and background music. 
+
+My research will be centered around TikTok videos (which ranges in duration from 3 seconds to 10 minutes). Tiktok users also referred to as Creators are able to get creative and use these 3 seconds to 10 minute videos to pique their followers interest while also building their own following. I will be comparing the lengths of TikTok videos within my dataset and seek to determine whether the duration have a positive or negative effect on user engagement. That is; do users prefer longer or shorter videos?
+
+### PROJECT GOAL
+
+The goal of this project is to analyze sample TitkTok dataset(s) to determine if the the length of a video positively or negatively influences its popularity. That is, do TitkTokers prefer shorter or longer videos.
+
+### PROJECT QUESTION
+
+Is there a relationship between the duration of a TikTok video and the level of engagement from its viewers?
+
+### MOTIVATION
+
+I choose TikTok for my analysis because of its popularity and rapid growth. Tiktok's popularity piqued my interest because of its use of video marketing to garner its users attention almost to the point of addiction. I am also intrigued by TikTok's "For You" feed where each user's experience is tailored to your own interests and videos are recommended based on a user's previous search or activity.
+
+## DATA LOAD
+
+### LOAD PACKAGES
+
+```{r Packages, message=FALSE, warnings=FALSE}
+pkges <- c("tidyverse", "readr", "kableExtra", "dplyr", "ggplot2", "lubridate", "psych", "jsonlite", "scales")
+
+# Loop through the packages
+for (p in pkges) {
+  # Check if package is installed
+  if (!requireNamespace(p, quietly = TRUE)) {
+    install.packages(p) #If the package is not installed, install the package
+    
+    library(p, character.only = TRUE) #Load the package
+  } else {
+    library(p, character.only = TRUE) #If the package is already installed, load the package
+  }
+}
+```
+
+### LOAD DATA - GITHUB
+
+```{r Github Data, message=FALSE, warnings=FALSE}
+TikTok_Data_csv <- read.csv("https://raw.githubusercontent.com/BeshkiaKvarnstrom/MSDS-DATA607/main/sug_users_vids3.csv")
+
+head(TikTok_Data_csv, 20)
+
+```
+
+### LOAD DATA - JSON
+
+```{r JSON Data, message=FALSE, warnings=FALSE}
+# URL of the JSON file
+JSON_url <- "https://github.com/BeshkiaKvarnstrom/MSDS-DATA607/raw/main/dataset_free-tiktok-scraper_2022-07-27_21-44-20-266.json"
+
+# Read the JSON file into a dataframe
+JSON_data <- jsonlite::fromJSON(JSON_url)
+
+# View the dataframe
+head(JSON_data, 20)
+
+```
+
+### DATA CLEANING {.tabset}
+
+```{r CSV Data Cleaning, message=FALSE, warnings=FALSE}
+#Return only a subset of the data(from csv file) that we will use for our analysis
+TikTokDF_csv <- TikTok_Data_csv[,c("user_name", "create_time", "hashtags", "video_length", "n_likes", "n_shares", "n_comments", "n_plays", "n_followers", "n_total_likes", "n_total_vids")]
+
+#Use the Rename() function to change the column names in the dataframe
+TikTokDF_csv <- TikTokDF_csv %>% 
+           rename("TikTok_User_Name" = "user_name", "Video_Date" = "create_time", "Hashtags" = "hashtags", "Video_Length" = "video_length", "Total_Video_Likes" = "n_likes", "Total_Video_Shares" = "n_shares", "Total_Video_Comments" = "n_comments", "Total_Video_Plays"= "n_plays", "Total_User_Followers" = "n_followers", "Total_User_Likes" = "n_total_likes", "Total_Videos" = "n_total_vids")
+
+TikTokDF_csv <- drop_na(TikTokDF_csv)  # Drop rows with any missing values
+
+#Add new Total Engagement column, which is the sum of all likes, shares, comments, and views
+TikTokDF_csv <- TikTokDF_csv %>%
+  group_by(TikTok_User_Name) %>% #Here we group the major category
+mutate(Total_Engagement = Total_Video_Likes+Total_Video_Shares+Total_Video_Comments+Total_Video_Plays, Engagement_Rate = (Total_Video_Likes+Total_Video_Shares+Total_Video_Comments+Total_Video_Plays)/Total_User_Followers, Video_Date = as_datetime(Video_Date), dSource = "CSV" )
+
+# Remove duplicate rows
+TikTokDF_csv <- TikTokDF_csv %>% distinct()
+head(TikTokDF_csv, 20)
+
+```
+
+```{r JSON Data Cleaning, message=FALSE, warnings=FALSE}
+#Return only the subset of the data(from JSON File) that we will use for our analysis
+JSONDF <- JSON_data[,c("authorMeta/name", "createTimeISO", "hashtags/1/name", "videoMeta/duration", "diggCount", "shareCount", "commentCount", "playCount", "authorMeta/fans", "authorMeta/heart", "authorMeta/digg")]
+
+#Use the Rename() function to change the column names in the dataframe 
+JSONDF <- JSONDF %>% 
+           rename("TikTok_User_Name" = "authorMeta/name", "Video_Date" = "createTimeISO", "Hashtags" = "hashtags/1/name", "Video_Length" = "videoMeta/duration", "Total_Video_Likes" = "diggCount", "Total_Video_Shares" = "shareCount", "Total_Video_Comments" = "commentCount", "Total_Video_Plays"= "playCount", "Total_User_Followers" = "authorMeta/fans", "Total_User_Likes" = "authorMeta/heart", "Total_Videos" = "authorMeta/digg")
+
+JSONDF <- drop_na(JSONDF)  # Drop rows with any missing values
+
+#Add new Total Engagement column, which is the sum of all likes, shares, comments, and views
+JSONDF <- JSONDF %>%
+  group_by(TikTok_User_Name) %>% #Here we group the major category
+mutate(Total_Engagement = Total_Video_Likes+Total_Video_Shares+Total_Video_Comments+Total_Video_Plays, Engagement_Rate = (Total_Video_Likes+Total_Video_Shares+Total_Video_Comments+Total_Video_Plays)/Total_User_Followers, Video_Date = as_datetime(Video_Date), dSource = "JSON" )
+
+# Remove duplicate rows
+JSONDF <- JSONDF %>% distinct()
+head(JSONDF, 20)
+
+```
+
+Combine both dataframes (data from csv and JSON) in one dataframe and display the data in a table
+
+```{r, message=FALSE, warnings=FALSE}
+TikTok_df <- rbind(TikTokDF_csv, JSONDF)
+
+# Drop rows with any missing values
+TikTok_df <- drop_na(TikTok_df)  
+
+#Remove the duplicates from the JSON dataset
+TikTok_df <- distinct(TikTok_df)
+
+#Use the filter function to remove rows with Video_Length < 1
+TikTok_df <- filter(TikTok_df, Video_Length >= 1)
+
+TikTok_df %>% kable() %>% 
+  kable_styling(bootstrap_options = "striped", font_size = 12) %>% 
+  scroll_box(height = "100%", width = "100%")
+
+```
+
+## DATA ANALYSIS
+
+Summary statistics for the variables that will be used in the study
+
+```{r, message=FALSE, warnings=FALSE}
+#Total cases in the study
+nrow(TikTok_df)
+
+SumTikTok <- TikTok_df[, c("Video_Length", "Total_Video_Likes", "Total_Video_Shares", "Total_Video_Comments", "Total_Video_Plays", "Total_Engagement", "Engagement_Rate")]
+
+SumTikTok %>%  
+  select(Video_Length, Total_Video_Likes, Total_Video_Shares, Total_Video_Comments, Total_Video_Plays, Total_Engagement, Engagement_Rate) %>%
+summary()%>% kable() %>% 
+  kable_styling(bootstrap_options = "striped", font_size = 12) %>% 
+  scroll_box(height = "100%", width = "100%")
+
+
+
+
+```
+
+The **`cor()`** function was used to compute the correlation matrix for the SumTikTok data frame and the result assigned the to the **`correlation_matrix`** variable.
+
+```{r, message=FALSE, warnings=FALSE}
+TikTok_Cor <- SumTikTok %>%  
+  select(Video_Length, Total_Video_Likes, Total_Video_Shares, Total_Video_Comments, Total_Video_Plays, Total_Engagement) 
+
+correlation_matrix <- cor(TikTok_Cor)
+
+
+correlation_matrix %>% kable() %>% 
+kable_styling(bootstrap_options = "striped", font_size = 12) %>% 
+scroll_box(height = "100%", width = "100%")
+
+```
+
+As shown above there is no correlation between the length of a video and the Total engagement valiables(likes, share, comments and shares) as well as no correlation between the TikTok video length and video plays.
+
+There is a strong correlation between Total Engagement and total video plays
+
+```{r, message=FALSE, warnings=FALSE}
+
+ggplot(SumTikTok, aes(x = Total_Video_Plays)) +
+  geom_histogram(fill = "#381b45") +
+  labs(title = "Tiktok Video Engagement", subtitle = "Distribution of Video Plays", x = "Video Plays", y = "Count") +
+  theme(
+    panel.background = element_rect(fill = "#f2e6f7", colour = "#f2e6f7", linewidth = 0.5, linetype = "solid"),
+    panel.grid.major = element_line(linewidth = 0.5, linetype = 'solid', colour = "white"), 
+    panel.grid.minor = element_line(linewidth = 0.25, linetype = 'solid', colour = "white")
+  ) +
+  scale_x_continuous(labels = scales::comma)
+```
+
+```{r, message=FALSE, warnings=FALSE}
+#Visualize the relationship between Video Plays and Engagement
+VideoEngagement <- lm(Total_Video_Plays ~ Total_Engagement, data = SumTikTok)
+summary(VideoEngagement)
+
+plot(VideoEngagement, col = "#381b45")
+
+```
+
+```{r}
+#The following scatter plot depicts the relationship between The Video Plays and Total Engagement 
+ggplot(SumTikTok, aes(x = Total_Video_Plays, y = Total_Engagement)) +
+  geom_point(size=1.5, col="#381b45") + 
+  geom_smooth(method=lm, se=TRUE, fullrange=TRUE, color = 'green') +
+labs(x="Total Video Plays", y="Total Engagement", 
+     title="Impact of Video Plays on Engagement")
+```
+
+```{r, message=FALSE, warnings=FALSE}
+ggplot(SumTikTok, aes(x = Video_Length)) +
+  geom_histogram(fill = "#381b45",  binwidth = 25) +
+  labs(title = "Tiktok Video Engagement", subtitle = "Distribution of Video Length", x = "Video Length(Seconds)", y = "Count") +
+ theme(
+  panel.background = element_rect(fill = "#f2e6f7",
+                                colour = "#f2e6f7",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )
+
+```
+
+```{r, message=FALSE, warnings=FALSE}
+#Visualize the relationship between Video Length and Engagement
+VideoLgth <- lm(Video_Length ~ Total_Engagement, data = SumTikTok)
+summary(VideoLgth)
+
+plot(VideoLgth, col = "#381b45")
+
+```
+
+```{r, message=FALSE, warnings=FALSE}
+#The following scatter plot depicts the relationship between The Video Length and Total Engagement 
+ggplot(SumTikTok, aes(x = Video_Length, y = Total_Engagement)) +
+  geom_point(size=1.5, col="#381b45") + 
+  geom_smooth(method=lm, se=TRUE, fullrange=TRUE, color = 'green') +
+labs(x="Length of Video(Seconds)", y="Total Engagement", 
+     title="Impact of Video Length on Engagement")
+```
+
+## CONCLUSION
+
+The study performed shows that TikTokers prefer shorter videos. There is enough evidence to say with 0.73% confidence that the level of engagement(Total likes, shares and comments) on longer videos is lower that that of shorter videos.
+
+The adjusted R-squared value is a statistical measure used to assess the goodness of fit of a regression model. It represents the proportion of the variance in the dependent variable that can be explained by the independent variables included in the model.
+
+The adjusted R-squared value of 0.9986 shown in the Video Plays and Engagement Model indicates that approximately 99.86% of the variability in the dependent variable can be explained by the independent variables in the regression model. This suggests that the model provides an excellent fit to the data and is able to explain a large portion of the variation in the dependent variable.
+
+It is important to note that a high adjusted R-squared value does not necessarily imply that the Video Plays and Engagement Model is the best or most appropriate for the data. It is always essential to consider other factors such as the model assumptions, the context of the analysis, and the interpretability of the coefficients to fully evaluate the model's validity and usefulness.
+
+The adjusted R-squared value of 0.007292 in the Video Length and Engagement Model indicates that only a very small proportion of the variability in the dependent variable can be explained by the independent variables in the regression model. Specifically, approximately 0.73% of the variation in the dependent variable can be accounted for by the included independent variables.
+
+This suggests that the Video Length and Engagement Model has a poor fit to the data and is not able to effectively explain or predict the variability in the dependent variable. The majority of the variation in the dependent variable is likely due to other factors or sources of variation that are not captured by the independent variables in the model.
+
+It is important to re-evaluate the model, consider other potential predictors, or explore alternative modeling approaches to improve the fit and increase the explanatory power of the model.
+
+### SOURCES
+
+Both TikTok datasets used in this study were downloaded from Kaggle. The links to the data sets are:
+
+-   <https://www.kaggle.com/datasets/vbradculbertson/tiktok-trending-metadata?select=sug_users_vids3.csv> (This data set was originally obtained from TikTok's trending API by a GitHub user named Ivan Tran)
+
+-   <https://www.kaggle.com/datasets/anasmahmood000/tiktok-dataset> (This data set was originally an Excel file and I used an online resource to convert the Excel File to a JSON File.)
+
+**Other Source(s)**
+
+The website used to convert the Excel File to JSON is: <https://products.aspose.app/cells/conversion/excel-to-json>
