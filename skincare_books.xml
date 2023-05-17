@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<books>
+  <book>
+    <title>The Black Skin Care Guide: How to Achieve and Maintain Flawless Skin for Black Women</title>
+    <authors>Candace Jenkin, Agnes Jean-Baptiste</authors>
+    <year>2019</year>
+    <format>Paperback</format>
+    <price>$44.95</price>
+  </book>
+  <book>
+    <title>Skincare for Women of Color: How to Fade Dark Spots, Even Skin Tone, and Achieve a Healthy, Radiant Complexion</title>
+    <authors>Celia J. Anderson, Danielle J. Glover</authors>
+    <year>2020</year>
+    <format>Paperback</format>
+    <price>$35.95</price>
+  </book>
+  <book>
+    <title>Beautiful Black Skin: For Women of Color - Unlocking the Secrets to Beautiful Skin</title>
+    <authors>Carla Trowell</authors>
+    <year>2017</year>
+    <format>Paperback</format>
+    <price>$42</price>
+  </book>
+</books>
+
