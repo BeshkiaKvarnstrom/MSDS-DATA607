@@ -1,20 +1,30 @@
 ---
-title: "DATA-607-Project 2-Beshkia Kvarnstrom"
+title: "DATA 607 Project 2 Beshkia Kvarnstrom"
 author: "Beshkia Kvarnstrom"
 date: "2023-03-06"
-output: html_document
+output: rmdformats::readthedown
 ---
 
-```{r setup, include=FALSE}
+```{r setup, echo=TRUE, results='hide', warning=FALSE, message=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
-library(tidyr)
-library(readr )
-library(kableExtra)
-library(dplyr)
-library(ggplot2)
-library(stringr)
 ```
+
+```{r Load Packages, message=FALSE, warnings=FALSE}
+pkges <- c("tidyr","readr","kableExtra","dplyr","ggplot2","stringr", "scales")
+
+# Loop through the packages
+for (p in pkges) {
+  # Check if package is installed
+  if (!requireNamespace(p, quietly = TRUE)) {
+    install.packages(p) #If the package is not installed, install the package
+    
+    library(p, character.only = TRUE) #Load the package
+  } else {
+    library(p, character.only = TRUE) #If the package is already installed, load the package
+  }
+}
+```
+
 
 ### The goal of this assignment is to give you practice in preparing different datasets for downstream analysis work.
 
@@ -43,21 +53,27 @@ Test_Score_Data <- read_csv('https://raw.githubusercontent.com/BeshkiaKvarnstrom
                           show_col_types = FALSE)
 ```
 ### Create dataframe to store the data 
-```{r}
+```{r, message=FALSE, warnings=FALSE}
 Test_Score_Data <- data.frame(Test_Score_Data)
-Test_Score_Data
+Test_Score_Data %>% 
+head(20) %>%
+  kable() %>% 
+  kable_styling(bootstrap_options = "striped", font_size = 12, fixed_thead = T) %>%  scroll_box(height = "300px", width = "100%")
 
 ```
 ## Tidying the Student Test Score Results data
-```{r}
+```{r, message=FALSE, warnings=FALSE}
 colnames(Test_Score_Data) <- c("ID", "NAME", "PHONE", "GENDER", "AGE", "TEST NO.", "TERM", "TEST SCORE")
 colnames(Test_Score_Data) <- c("ID", "NAME", "PHONE", "GENDER", "AGE", "TEST NO.", "TERM", "TEST SCORE")
-Test_Score_Data
+Test_Score_Data%>% 
+head(20) %>%
+  kable() %>% 
+  kable_styling(bootstrap_options = "striped", font_size = 12, fixed_thead = T) %>%  scroll_box(height = "300px", width = "100%")
 ```
 
 ## Analyze and Visualize the Student Test Score Results data
 
-```{r}
+```{r, message=FALSE, warnings=FALSE}
 # Analyzing the test score to determine the minimum, maximum, mean and median test scores for each term by gender. From the analysis you can see that females did better than males overall.
 Agg_TestScores <- Test_Score_Data %>% group_by(GENDER) %>% group_by(GENDER, TERM) %>%
             summarise(
@@ -67,11 +83,14 @@ Agg_TestScores <- Test_Score_Data %>% group_by(GENDER) %>% group_by(GENDER, TERM
                      .groups = 'drop'
                     )
 
-Agg_TestScores
+Agg_TestScores%>% 
+head(20) %>%
+  kable() %>% 
+  kable_styling(bootstrap_options = "striped", font_size = 12, fixed_thead = T) %>%  scroll_box(height = "300px", width = "100%")
 
 ```
 
-```{r}
+```{r, message=FALSE, warnings=FALSE}
 # The following plot compares the test scores for each gender and the terms taken. 
 ggplot(data = Agg_TestScores) +
   geom_bar(mapping = aes(x = TERM, y = `MEAN TEST SCORE`, fill = GENDER), stat = 'identity') +
@@ -80,7 +99,7 @@ ggplot(data = Agg_TestScores) +
   labs(title = 'AVERAGE TEST SCORES PER TERM', subtitle = "By Gender")
 ```
 
-```{r}
+```{r, message=FALSE, warnings=FALSE}
 # This visualition displays the test scores per student for each term
 ggplot(data = Test_Score_Data) +
   geom_bar(mapping = aes(x=NAME, y=`TEST SCORE`, fill = `TERM`), stat = 'identity') +
@@ -90,21 +109,24 @@ ggplot(data = Test_Score_Data) +
 ```
 
 ## Dataset 2 - 
-```{r Read Interest Rate Data from Github}
+```{r Read Interest Rate Data from Github, message=FALSE, warnings=FALSE}
 Int_Rate_Data <- read_csv('https://raw.githubusercontent.com/BeshkiaKvarnstrom/MSDS-DATA607/main/interest_rate_of_banks.csv', 
                           show_col_types = FALSE)
 
 ```
 
 ### Create dataframe to store the data 
-```{r}
+```{r, message=FALSE, warnings=FALSE}
 Int_Rate_Data <- data.frame(Int_Rate_Data)
-Int_Rate_Data
+Int_Rate_Data%>% 
+head(20) %>%
+  kable() %>% 
+  kable_styling(bootstrap_options = "striped", font_size = 12, fixed_thead = T) %>%  scroll_box(height = "300px", width = "100%")
 
 ```
 
 ## Tidying the Student Test Score Results data
-```{r}
+```{r, message=FALSE, warnings=FALSE}
 
 # Use the tidyr function gather() to unpivot data from a "wide" to a "long" format
 Int_Rate_df <-gather(Int_Rate_Data, bank_name ,'interest_rate',2:8)
@@ -113,18 +135,24 @@ Int_Rate_df <-gather(Int_Rate_Data, bank_name ,'interest_rate',2:8)
 Int_Rate_df <- Int_Rate_df[!apply(is.na(Int_Rate_df[3:3]),1,all), ]
 
 
-Int_Rate_df
+Int_Rate_df%>% 
+head(20) %>%
+  kable() %>% 
+  kable_styling(bootstrap_options = "striped", font_size = 12, fixed_thead = T) %>%  scroll_box(height = "300px", width = "100%")
 ```
 
 Calculate Average interest rate to analyze the trend 
-```{r}
+```{r, message=FALSE, warnings=FALSE}
 Avg_Int_Rate_df <- Int_Rate_df %>% group_by(bank_name) %>% summarize(`average interest rate` = mean(`interest_rate`))
 
-head(Avg_Int_Rate_df)  %>% kable() %>% kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>% scroll_box(width="100%",height="300px")
+head(Avg_Int_Rate_df)  %>% 
+head(20) %>%
+  kable() %>% 
+  kable_styling(bootstrap_options = "striped", font_size = 12, fixed_thead = T) %>%  scroll_box(height = "300px", width = "100%")
 
 ```
 
-```{r}
+```{r, message=FALSE, warnings=FALSE}
 ggplot(data=Avg_Int_Rate_df, aes(x=bank_name,y=`average interest rate`, group=1)) +
   geom_line(arrow = arrow(), color = "purple",size = 1.2)+
   geom_point(color = "green", size = 3)+
@@ -135,7 +163,7 @@ ggplot(data=Avg_Int_Rate_df, aes(x=bank_name,y=`average interest rate`, group=1)
   geom_text(aes(label=paste0(round(`average interest rate`,2))), vjust=-1, color="black", position = position_dodge(0.9), size=3.5) 
 ```
 
-```{r}
+```{r, message=FALSE, warnings=FALSE}
 # The following plot compares the interest year across the years
 
 ggplot(data = Avg_Int_Rate_df) +
@@ -146,34 +174,30 @@ ggplot(data = Avg_Int_Rate_df) +
 
 ## Dataset 3 - 
 ### Import Data from Github and load in R
-```{r Read Subway Data from Github}
+```{r Read Subway Data from Github, message=FALSE, warnings=FALSE}
 NYC_Subway_Data <- read_csv('https://raw.githubusercontent.com/BeshkiaKvarnstrom/MSDS-DATA607/main/NYC_Subway_Ridership.csv', 
                           show_col_types = FALSE)
-NYC_Subway_Data
-```
-
-### Create dataframe to store the data 
-```{r}
-NYC_Subway_Data <- data.frame(NYC_Subway_Data)
-NYC_Subway_Data
-
+NYC_Subway_Data%>% 
+head(20) %>%
+  kable() %>% 
+  kable_styling(bootstrap_options = "striped", font_size = 12, fixed_thead = T) %>%  scroll_box(height = "300px", width = "100%")
 ```
 
 ## Tidying the NYC Subway data
-```{r}
+```{r, message=FALSE, warnings=FALSE}
 # Each borough is used to separate the data in the file. This separation is identified by a row entry for each borough at the beginning of the respective borough's data set. We need to identify the row numbers for each borough.
 row_b <- c('The Bronx', 'Brooklyn', 'Manhattan', 'Queens')
 
 rownum <- c()
 
 for(i in 1:length(row_b)){
-  rownum[i] <- rownames(NYC_Subway_Data[which(NYC_Subway_Data$'X2013' == row_b[i]),])
+  rownum[i] <- rownames(NYC_Subway_Data[which(NYC_Subway_Data$'2013' == row_b[i]),])
 }
 
 ```
 
 
-```{r}
+```{r, message=FALSE, warnings=FALSE}
 d = NULL
 for(i in 1:length(rownum)){
 
@@ -200,40 +224,73 @@ for(i in 1:length(rownum)){
 
 # combined all sub datasets
 NYC_Subway_Data2 <- rbind(Bronx, Brooklyn, Manhattan, Queens)
+NYC_Subway_Data2%>% 
+head(20) %>%
+  kable() %>% 
+  kable_styling(bootstrap_options = "striped", font_size = 12, fixed_thead = T) %>%  scroll_box(height = "300px", width = "100%")
 
+
+```
+
+```{r, message=FALSE, warnings=FALSE}
 NYC_Subway_Data2 <- NYC_Subway_Data2 %>%
-  mutate('X2013' = as.integer(str_remove_all(NYC_Subway_Data2$'X2013', ',')),
-         'X2014' = as.integer(str_remove_all(NYC_Subway_Data2$'X2014', ',')),
-         'X2015' = as.integer(str_remove_all(NYC_Subway_Data2$'X2015', ',')),
-         'X2016' = as.integer(str_remove_all(NYC_Subway_Data2$'X2016', ',')),
-         'X2017' = as.integer(str_remove_all(NYC_Subway_Data2$'X2017', ',')),
-         'X2018' = as.integer(str_remove_all(NYC_Subway_Data2$'X2018', ',')),
-         'X2017.2018.Change' = as.integer(str_remove_all(NYC_Subway_Data2$'X2017.2018.Change', ',')),
-         'X2017.2018.Change2' = as.numeric(str_remove_all(NYC_Subway_Data2$'X2017.2018.Change2', '%')),
-         'X2018.Rank' = as.integer(NYC_Subway_Data2$'X2018.Rank')) %>%
-  select(Borough, colnames(NYC_Subway_Data2))
+  mutate('2013' = as.integer(str_remove_all(NYC_Subway_Data2$'2013', ',')),
+         '2014' = as.integer(str_remove_all(NYC_Subway_Data2$'2014', ',')),
+         '2015' = as.integer(str_remove_all(NYC_Subway_Data2$'2015', ',')),
+         '2016' = as.integer(str_remove_all(NYC_Subway_Data2$'2016', ',')),
+         '2017' = as.integer(str_remove_all(NYC_Subway_Data2$'2017', ',')),
+         '2018' = as.integer(str_remove_all(NYC_Subway_Data2$'2018', ',')),
+         '2017-2018 Change' = as.integer(str_remove_all(NYC_Subway_Data2$'2017-2018 Change', ',')),
+         '2017-2018 Change2' = as.numeric(str_remove_all(NYC_Subway_Data2$'2017-2018 Change2', '%')),
+         '2018 Rank' = as.integer(NYC_Subway_Data2$'2018 Rank')) %>%
+select(Borough, colnames(NYC_Subway_Data2))%>%
+na.omit()
 
-
-NYC_Subway_Data2
+NYC_Subway_Data2%>% 
+head(20) %>%
+  kable() %>% 
+  kable_styling(bootstrap_options = "striped", font_size = 12, fixed_thead = T) %>%  scroll_box(height = "300px", width = "100%")
 ```
 
 
-```{r}
+
+
+
+```{r, message=FALSE, warnings=FALSE}
 # Use the tidyr function gather() to unpivot data from a "wide" to a "long" format
 Subway_df <-gather(NYC_Subway_Data2, Year ,'total riders',3:11)
 
-
 colnames(Subway_df) <- c('Borough', 'Subway Station', 'Year', 'Total Riders')
-Subway_df
+Subway_df%>% 
+  head(20) %>%
+  kable() %>% 
+  kable_styling(bootstrap_options = "striped", font_size = 12, fixed_thead = T) %>% 
+  scroll_box(height = "300px", width = "100%")
 ```
 
-```{r}
 
-ggplot(data = Subway_df) +
-  geom_bar(mapping = aes(x = Year, y = `Total Riders`, fill = Borough), stat = 'identity') +
-  facet_grid(~ Borough) +
-  theme(axis.text.x = element_text(angle = 70, hjust = 1)) +
-  labs(title = 'Average Riderhip from 2013 - 2018 by Borough')
+##The following bar chart displays the average riders for each Borough from 2013-2018 
+```{r, message=FALSE, warnings=FALSE}
+Subway_df <- na.omit(Subway_df)
 
+sum_riders <- Subway_df %>%
+  group_by(Year, Borough) %>%
+  summarize(
+    min_riders = min(`Total Riders`),
+    avg_riders = mean(`Total Riders`),
+    max_riders = max(`Total Riders`),
+    .groups = "drop"
+  )
+
+ggplot(data = sum_riders, aes(x = Year, y = avg_riders, fill = Borough)) +
+  geom_bar(stat = "identity", position = "stack") +
+  labs(title = 'Average NYC Subway Ridership', subtitle = "By Borough (2013 - 2018)") +
+ scale_y_continuous(labels = comma)+  # Format y-axis labels with commas
+ 
+  xlab("Ridership Year") +  # Update x-axis label
+  theme(axis.text.x = element_text(angle = 70, hjust = 1))
 ```
+
+##Conclusion
+My Analysis shows that of all the Borough Queens had the highest Riders.
 
